@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ComicCraft</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fce4ec;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .container {
+            background: white;
+            max-width: 800px;
+            margin: auto;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #e91e63;
+            font-size: 40px;
+        }
+
+        .subtitle {
+            color: #555;
+            font-size: 20px;
+        }
+
+        input {
+            width: 75%;
+            padding: 14px;
+            border: 2px solid #e91e63;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 13px 28px;
+            background: #e91e63;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+
+        button:hover {
+            background: #c2185b;
+        }
+
+        #result {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .panel {
+            background: #fff5f8;
+            border: 2px solid #e91e63;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .panel h2 {
+            color: #e91e63;
+        }
+
+        .panel p {
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🎨 ComicCraft</h1>
+
+    <p class="subtitle">AI Comic Story Creator</p>
+
+    <input
+        type="text"
+        id="storyIdea"
+        placeholder="Enter your story idea"
+    >
+
+    <br>
+
+    <button onclick="generateComic()">
+        🎨 Generate Comic
+    </button>
+
+    <button onclick="exportPDF()">
+        📄 Download PDF
+    </button>
+
+    <div id="result"></div>
+
+</div>
+
+<script>
+async function generateComic() {
+    const idea = document.getElementById("storyIdea").value;
+    const result = document.getElementById("result");
+
+    if (idea.trim() === "") {
+        result.innerText = "Please enter a story idea.";
+        return;
+    }
+
+    result.innerText = "Generating your comic story...";
+
+    try {
+        const response = await fetch("/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                idea: idea
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            result.innerHTML = "";
+
+            const box = document.createElement("div");
+            box.className = "panel";
+
+            box.innerHTML =
+                "<img src='/static/comic_sample.png' width='100%' style='border-radius:10px;'>" +
+                "<h2>🎬 Comic Story</h2>" +
+                "<p>" +
+                data.reply
+                    .replace(/\*/g, "")
+                    .replace(/\n/g, "<br>") +
+                "</p>";
+
+            result.appendChild(box);
+
+        } else {
+            result.innerText = "Error: " + JSON.stringify(data);
+        }
+
+    } catch (error) {
+        result.innerText = "Something went wrong: " + error.message;
+    }
+}
+
+
+async function exportPDF() {
+    const idea = document.getElementById("storyIdea").value;
+
+    const response = await fetch("/export", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            idea: idea
+        })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+        alert("PDF created successfully!");
+    } else {
+        alert("PDF creation failed");
+    }
+}
+</script>
+</body>
+</html>

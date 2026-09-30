@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ComicCraft Preview</title>
+</head>
+
+<body>
+
+<h1>🎨 ComicCraft - Comic Preview</h1>
+
+{% for panel in layout %}
+
+<div>
+    <h2>Panel {{ panel.number }}: {{ panel.title }}</h2>
+
+    <p><i>{{ panel.scene_description }}</i></p>
+
+    <p>{{ panel.dialogue }}</p>
+
+    {% if panel.image %}
+        <img src="{{ panel.image }}" width="400">
+    {% endif %}
+</div>
+
+<hr>
+
+{% endfor %}
+
+</body>
+</html>
